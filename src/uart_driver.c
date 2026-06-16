@@ -92,6 +92,19 @@ void uart_print_num(uint16_t num) {
         uart_putchar(buf[j]);
     }
 }
+// =========================================================================
+// UTILITAS STRING PROGMEM: Kirim Untaian Teks Null-Terminated Dari Progmem
+// =========================================================================
+void uart_print_p(const char* flash_str) {
+    char c;
+    // Read one byte at a time directly from the Flash memory bus
+    while ((c = pgm_read_byte(flash_str++))) {
+        if (c == '\n') {
+            uart_putchar('\r');
+        }
+        uart_putchar(c);
+    }
+}
 
 // =========================================================================
 // UTILITAS PEMBACAAN 1: Ambil Jumlah Karakter Tersedia (Void Rule Compliance)

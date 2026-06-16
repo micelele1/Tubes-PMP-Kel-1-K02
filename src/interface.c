@@ -9,8 +9,25 @@ static uint8_t cmd_idx = 0;
 void interface_init(void) {
     cmd_idx = 0;
     cmd_buffer[0] = '\0';
-    uart_print("\n=== INVENTARIS TERMINAL READY ===\n");
-    uart_print("Format: MENU atau CMD;PARAM1;PARAM2;...\n>> ");
+    
+    // OPTIMIZED: Text stays in Flash memory!
+    uart_print_p(PSTR("System status: ACTIVE\n"));
+    
+    uint16_t free_ram_space = 0;
+    cekMemori(&free_ram_space);
+    
+    uart_print_p(PSTR("Available SRAM Room: "));
+    uart_print_num(free_ram_space);
+    uart_print_p(PSTR(" bytes\n"));
+    uart_print_p(PSTR("--------------------------------------------------\n"));
+    uart_print_p(PSTR("\n=== INVENTARIS TERMINAL READY ===\n"));
+    uart_print_p(PSTR("Format: MENU atau CMD;PARAM1;PARAM2;...\n>> "));
+    uart_print_p(PSTR("--- FITUR COMMAND TERMINAL ---\n"));
+    uart_print_p(PSTR("1. MENU / HELP\n"));
+    uart_print_p(PSTR("2. INSERTS;ID;NAMA;KAT;JML;LOKASI;STAT;OWN;PIC\n"));
+    uart_print_p(PSTR("3. SEARCH;ID\n"));
+    uart_print_p(PSTR("4. DELETE;ID\n"));
+    uart_print_p(PSTR("--------------------------------------------------\n"));
 }
 
 void interface_loop(void) {
@@ -19,7 +36,7 @@ void interface_loop(void) {
 
     while (bytes_waiting > 0) {
         char c = '\0';
-        uart_getchar(&c); // FIXED: matching your driver name uart_getchar
+        uart_getchar(&c); 
 
         // 1. HANDLE BACKSPACE (ASCII 127 or '\b') FIRST
         if (c == 127 || c == '\b') {
@@ -63,17 +80,17 @@ void interface_loop(void) {
 }
 
 void parse_and_execute(char* cmd_str) {
-    // Extract the first token: The Command Verb
     char* token = strtok(cmd_str, ";");
     if (token == NULL) return;
 
     // --- COMMAND 1: HELP / MENU ---
     if (strcmp(token, "MENU") == 0 || strcmp(token, "HELP") == 0) {
-        uart_print("--- FITUR COMMAND TERMINAL ---\n");
-        uart_print("1. MENU / HELP\n");
-        uart_print("2. INSERTS;ID;NAMA;KAT;JML;LOKASI;STAT;OWN;PIC\n");
-        uart_print("3. SEARCH;ID\n");
-        uart_print("4. DELETE;ID\n");
+        // OPTIMIZED: Long menu arrays completely stripped out of SRAM baseline
+        uart_print_p(PSTR("--- FITUR COMMAND TERMINAL ---\n"));
+        uart_print_p(PSTR("1. MENU / HELP\n"));
+        uart_print_p(PSTR("2. INSERTS;ID;NAMA;KAT;JML;LOKASI;STAT;OWN;PIC\n"));
+        uart_print_p(PSTR("3. SEARCH;ID\n"));
+        uart_print_p(PSTR("4. DELETE;ID\n"));
         return;
     }
 
@@ -89,7 +106,7 @@ void parse_and_execute(char* cmd_str) {
         char* p_PIC      = strtok(NULL, ";");
 
         if (!p_id || !p_nama || !p_kategori || !p_jumlah || !p_lokasi || !p_status || !p_pemilik || !p_PIC) {
-            uart_print("Error: Parameter INSERT tidak lengkap!\n");
+            uart_print_p(PSTR("Error: Parameter INSERT tidak lengkap!\n"));
             return;
         }
 
@@ -100,7 +117,7 @@ void parse_and_execute(char* cmd_str) {
         uint8_t own = (uint8_t)atoi(p_pemilik);
 
         insertItem(id, p_nama, kat, jml, p_lokasi, stat, own, p_PIC);
-        uart_print("Sukses: Input diproses ke database.\n");
+        uart_print_p(PSTR("Sukses: Input diproses ke database.\n"));
         return;
     }
 
@@ -108,7 +125,7 @@ void parse_and_execute(char* cmd_str) {
     if (strcmp(token, "SEARCH") == 0) {
         char* p_id = strtok(NULL, ";");
         if (!p_id) {
-            uart_print("Error: ID harus diisi!\n");
+            uart_print_p(PSTR("Error: ID harus diisi!\n"));
             return;
         }
 
@@ -117,12 +134,12 @@ void parse_and_execute(char* cmd_str) {
         searchItem(target_id, &match);
 
         if (match == NULL) {
-            uart_print("Error: Item dengan ID tersebut tidak ditemukan.\n");
+            uart_print_p(PSTR("Error: Item dengan ID tersebut tidak ditemukan.\n"));
         } else {
-            uart_print("-> Item Ditemukan: \n");
-            uart_print("   Nama    : "); uart_print(match->nama);     uart_print("\n");
-            uart_print("   Jumlah  : "); uart_print_num(match->jumlah); uart_print("\n");
-            uart_print("   Lokasi  : "); uart_print(match->lokasi);   uart_print("\n");
+            uart_print_p(PSTR("-> Item Ditemukan: \n"));
+            uart_print_p(PSTR("   Nama    : ")); uart_print(match->nama);     uart_print_p(PSTR("\n"));
+            uart_print_p(PSTR("   Jumlah  : ")); uart_print_num(match->jumlah); uart_print_p(PSTR("\n"));
+            uart_print_p(PSTR("   Lokasi  : ")); uart_print(match->lokasi);   uart_print_p(PSTR("\n"));
         }
         return;
     }
@@ -131,16 +148,15 @@ void parse_and_execute(char* cmd_str) {
     if (strcmp(token, "DELETE") == 0) {
         char* p_id = strtok(NULL, ";");
         if (!p_id) {
-            uart_print("Error: ID harus diisi!\n");
+            uart_print_p(PSTR("Error: ID harus diisi!\n"));
             return;
         }
 
         uint16_t target_id = (uint16_t)atoi(p_id);
         deleteItem(target_id);
-        uart_print("Sukses: Eksekusi penghapusan selesai.\n");
+        uart_print_p(PSTR("Sukses: Eksekusi penghapusan selesai.\n"));
         return;
     }
 
-    // If token matches nothing
-    uart_print("Error: Command tidak dikenali. Ketik 'MENU' untuk bantuan.\n");
+    uart_print_p(PSTR("Error: Command tidak dikenali. Ketik 'MENU' untuk bantuan.\n"));
 }

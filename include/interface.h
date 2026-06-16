@@ -9,7 +9,7 @@
 #define CMD_BUFFER_SIZE 80
 
 // Fungsi Inti Interface
-void interface_init(void);
+void interface_init(void); 
 void interface_loop(void);
 void parse_and_execute(char* cmd_str);
 

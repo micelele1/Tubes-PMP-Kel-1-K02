@@ -11,28 +11,13 @@
 #define HASH_TABLE_SIZE 7
 
 // Kategori Barang Inventaris
-typedef enum {
-    K_SENSOR,
-    K_AKTUATOR,
-    K_MIKON,
-    K_KABEL,
-    K_INSTRUMEN
-} Kategori;
+typedef enum {K_SENSOR, K_AKTUATOR, K_MIKON, K_KABEL, K_INSTRUMEN} Kategori;
 
 // Status Barang Inventaris
-typedef enum {
-    S_TERSEDIA,
-    S_DIPINJAM,
-    S_RUSAK,
-    S_HABIS
-} Status;
+typedef enum {S_TERSEDIA, S_DIPINJAM, S_RUSAK, S_HABIS} Status;
 
 // Pemilik Barang Inventaris
-typedef enum {
-    P_LDTE,
-    P_HME,
-    P_DOSEN
-} Pemilik;
+typedef enum {P_LDTE, P_HME, P_DOSEN} Pemilik;
 
 // Struktur Data Barang Inventaris
 typedef struct NodeInventaris{
@@ -55,6 +40,7 @@ void initNode(Inventaris* node);
 void initHashTable(void);                           // Inisialisasi Hash Table
 void initDB(void);                                  // Inisialisasi Database
 void hash_function(uint16_t id, uint8_t* index);    // Fungsi Hash untuk Menentukan Index dalam Hash Table
+void cekMemori(uint16_t* memori);                   // Cek Besar Memori yang Tersisa
 
 // Fungsi CRUD
 // Menambahkan Item Baru ke Database

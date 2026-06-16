@@ -15,16 +15,16 @@
 //     // 3. Clear your terminal screen and print a welcoming header
 //     // Using our lightweight uart_print instead of the heavy printf!
 //     uart_print("\n\e[1;36m=== BAREMETAL UART & DATABASE INTEGRATION TEST ===\e[0m\n");
-//     uart_print("System status: ACTIVE\n");
+    // uart_print("System status: ACTIVE\n");
     
-//     // 4. Check our available SRAM room using our custom utility
-//     uint16_t free_ram_space = 0;
-//     cekMemori(&free_ram_space);
+    // // 4. Check our available SRAM room using our custom utility
+    // uint16_t free_ram_space = 0;
+    // cekMemori(&free_ram_space);
     
-//     uart_print("Available SRAM Room: ");
-//     uart_print_num(free_ram_space);
-//     uart_print(" bytes\n");
-//     uart_print("--------------------------------------------------\n");
+    // uart_print("Available SRAM Room: ");
+    // uart_print_num(free_ram_space);
+    // uart_print(" bytes\n");
+    // uart_print("--------------------------------------------------\n");
 //     uart_print("Type anything into your terminal. The Arduino will catch it\n");
 //     uart_print("via Asynchronous Interrupts and echo it back live!\n\n");
 
