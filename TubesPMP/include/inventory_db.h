@@ -68,7 +68,7 @@ void deleteItem(uint16_t id);
 void searchItem(uint16_t id, Inventaris** result);
 
 // Mengupdate Jumlah Barang dalam Database Berdasarkan ID
-void updateJumlah(uint16_t id, uint8_t newJumlah);
+void updateJumlah(uint16_t id, int16_t perubahan);
 
 // Mengupdate Status Barang dalam Database Berdasarkan ID
 void updateStatus(uint16_t id, uint8_t newStatus);
