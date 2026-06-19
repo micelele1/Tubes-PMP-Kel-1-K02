@@ -6,33 +6,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <avr/pgmspace.h>
 
 // Ukuran Hash Table
 #define HASH_TABLE_SIZE 7
 
 // Kategori Barang Inventaris
-typedef enum {
-    K_SENSOR,
-    K_AKTUATOR,
-    K_MIKON,
-    K_KABEL,
-    K_INSTRUMEN
-} Kategori;
+typedef enum {K_SENSOR, K_AKTUATOR, K_MIKON, K_INSTRUMEN} Kategori;
 
 // Status Barang Inventaris
-typedef enum {
-    S_TERSEDIA,
-    S_DIPINJAM,
-    S_RUSAK,
-    S_HABIS
-} Status;
+typedef enum {S_TERSEDIA, S_DIPINJAM, S_RUSAK, S_HABIS} Status;
 
 // Pemilik Barang Inventaris
-typedef enum {
-    P_LDTE,
-    P_HME,
-    P_DOSEN
-} Pemilik;
+typedef enum {P_LDTE, P_HME, P_DOSEN} Pemilik;
 
 // Struktur Data Barang Inventaris
 typedef struct NodeInventaris{

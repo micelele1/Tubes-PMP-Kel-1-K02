@@ -1,6 +1,6 @@
 #include "../include/inventory_db.h"
 #include "../include/uart_driver.h"
-#include <avr/pgmspace.h>
+
 
 Inventaris *hashTable[HASH_TABLE_SIZE];
 
@@ -177,61 +177,62 @@ void dump(){
 }
 
 void show(void) {
-uint16_t total_data = 0;
-uint16_t kat_counts[5] = {0, 0, 0, 0, 0};
-uint16_t stat_counts[4] = {0, 0, 0, 0};
-uint16_t rak_counts[26] = {0};
+    uint16_t total_data = 0;
+    uint16_t kat_counts[5] = {0, 0, 0, 0, 0};
+    uint16_t stat_counts[4] = {0, 0, 0, 0};
+    uint16_t rak_counts[26] = {0};
 
-for (int i = 0; i < HASH_TABLE_SIZE; i++) {
-    Inventaris* curr = hashTable[i];
-    while (curr != NULL) {
-        total_data++;
-        
-        if (curr->kategori <= 4) kat_counts[curr->kategori]++;
-        if (curr->status <= 3) stat_counts[curr->status]++;
+    for (int i = 0; i < HASH_TABLE_SIZE; i++) {
+        Inventaris* curr = hashTable[i];
+        while (curr != NULL) {
+            total_data++;
+            
+            if (curr->kategori <= 4) kat_counts[curr->kategori]++;
+            if (curr->status <= 3) stat_counts[curr->status]++;
 
-        char rak = curr->lokasi[0];
-        if (rak >= 'A' && rak <= 'Z') {
-            rak_counts[rak - 'A']++;
+            char rak = curr->lokasi[0];
+            if (rak >= 'A' && rak <= 'Z') {
+                rak_counts[rak - 'A']++;
+            }
+
+            curr = curr->next;
         }
-
-        curr = curr->next;
     }
-}
 
-uint16_t mem_free = 0;
-cekMemori(&mem_free);
-uint16_t max_items = mem_free / sizeof(Inventaris);
+    uint16_t mem_free = 0;
+    cekMemori(&mem_free);
+    mem_free = mem_free - 350;
+    uint16_t max_items = mem_free / sizeof(Inventaris);
 
-uart_print_P(PSTR("\n~^~^~^ STATISTIK INVENTARIS ~^~^~^\n"));
-uart_print_P(PSTR("Total Item : ")); uart_print_num(total_data); uart_print_P(PSTR("\n"));
+    uart_print_P(PSTR("\n~^~^~^ STATISTIK INVENTARIS ~^~^~^\n"));
+    uart_print_P(PSTR("Total Item : ")); uart_print_num(total_data); uart_print_P(PSTR("\n"));
 
-uart_print_P(PSTR("\n~^~^~^ STATUS ~^~^~^\n"));
-uart_print_P(PSTR("Tersedia   : ")); uart_print_num(stat_counts[0]); uart_print_P(PSTR("\n"));
-uart_print_P(PSTR("Dipinjam   : ")); uart_print_num(stat_counts[1]); uart_print_P(PSTR("\n"));
-uart_print_P(PSTR("Rusak      : ")); uart_print_num(stat_counts[2]); uart_print_P(PSTR("\n"));
-uart_print_P(PSTR("Habis      : ")); uart_print_num(stat_counts[3]); uart_print_P(PSTR("\n"));
+    uart_print_P(PSTR("\n~^~^~^ STATUS ~^~^~^\n"));
+    uart_print_P(PSTR("Tersedia   : ")); uart_print_num(stat_counts[0]); uart_print_P(PSTR("\n"));
+    uart_print_P(PSTR("Dipinjam   : ")); uart_print_num(stat_counts[1]); uart_print_P(PSTR("\n"));
+    uart_print_P(PSTR("Rusak      : ")); uart_print_num(stat_counts[2]); uart_print_P(PSTR("\n"));
+    uart_print_P(PSTR("Habis      : ")); uart_print_num(stat_counts[3]); uart_print_P(PSTR("\n"));
 
-uart_print_P(PSTR("\n~^~^~^ KATEGORI ~^~^~^\n"));
-uart_print_P(PSTR("Sensor     : ")); uart_print_num(kat_counts[0]); uart_print_P(PSTR("\n"));
-uart_print_P(PSTR("Aktuator   : ")); uart_print_num(kat_counts[1]); uart_print_P(PSTR("\n"));
-uart_print_P(PSTR("Mikon      : ")); uart_print_num(kat_counts[2]); uart_print_P(PSTR("\n"));
-uart_print_P(PSTR("Kabel      : ")); uart_print_num(kat_counts[3]); uart_print_P(PSTR("\n"));
-uart_print_P(PSTR("Instrumen  : ")); uart_print_num(kat_counts[4]); uart_print_P(PSTR("\n"));
+    uart_print_P(PSTR("\n~^~^~^ KATEGORI ~^~^~^\n"));
+    uart_print_P(PSTR("Sensor     : ")); uart_print_num(kat_counts[0]); uart_print_P(PSTR("\n"));
+    uart_print_P(PSTR("Aktuator   : ")); uart_print_num(kat_counts[1]); uart_print_P(PSTR("\n"));
+    uart_print_P(PSTR("Mikon      : ")); uart_print_num(kat_counts[2]); uart_print_P(PSTR("\n"));
+    uart_print_P(PSTR("Kabel      : ")); uart_print_num(kat_counts[3]); uart_print_P(PSTR("\n"));
+    uart_print_P(PSTR("Instrumen  : ")); uart_print_num(kat_counts[4]); uart_print_P(PSTR("\n"));
 
-uart_print_P(PSTR("\n~^~^~^ LOKASI (PER RAK) ~^~^~^\n"));
-for (int i = 0; i < 26; i++) {
-    if (rak_counts[i] > 0) {
-        uart_print_P(PSTR("Rak "));
-        uart_putchar('A' + i);
-        uart_print_P(PSTR("      : "));
-        uart_print_num(rak_counts[i]);
-        uart_print_P(PSTR(" item\n"));
+    uart_print_P(PSTR("\n~^~^~^ LOKASI (PER RAK) ~^~^~^\n"));
+    for (int i = 0; i < 26; i++) {
+        if (rak_counts[i] > 0) {
+            uart_print_P(PSTR("Rak "));
+            uart_putchar('A' + i);
+            uart_print_P(PSTR("      : "));
+            uart_print_num(rak_counts[i]);
+            uart_print_P(PSTR(" item\n"));
+        }
     }
-}
 
-uart_print_P(PSTR("\n~^~^ MEMORI SRAM ~^~^\n"));
-uart_print_P(PSTR("Sisa Memori: ")); uart_print_num(mem_free); uart_print_P(PSTR(" byte\n"));
-uart_print_P(PSTR("Kapasitas  : Muat sekitar ")); uart_print_num(max_items); uart_print_P(PSTR(" item lagi\n"));
-uart_print_P(PSTR("~^~^~^~^~^~^~^~^\n"));
+    uart_print_P(PSTR("\n~^~^ MEMORI SRAM ~^~^\n"));
+    uart_print_P(PSTR("Sisa Memori: ")); uart_print_num(mem_free); uart_print_P(PSTR(" byte\n"));
+    uart_print_P(PSTR("Kapasitas  : Muat sekitar ")); uart_print_num(max_items); uart_print_P(PSTR(" item lagi\n"));
+    uart_print_P(PSTR("~^~^~^~^~^~^~^~^\n"));
 }

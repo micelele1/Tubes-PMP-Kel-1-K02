@@ -1,6 +1,4 @@
 #include "../include/uart_driver.h"
-#include <avr/interrupt.h>
-#include <avr/pgmspace.h> // TAMBAHAN PENTING
 
 // Definisi CPU Clock untuk Kalkulasi Baud Rate Register
 #define F_CPU 16000000UL

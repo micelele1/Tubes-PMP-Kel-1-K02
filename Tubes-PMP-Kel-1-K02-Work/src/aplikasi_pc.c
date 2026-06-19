@@ -7,9 +7,9 @@ Deskripsi: untuk koneksi antara PC atau laptop dengan arduino,
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h> //windows API untuk connect sama OS biar bisa atur sleep, baudrate, sama fungsi low level
+#include <Windows.h> //windows API untuk connect sama OS biar bisa atur sleep, baudrate, sama fungsi low level
 
-HANDLE hComm; //biar arduino bisa komunikasi sama OS windows
+HANDLE hComm; //biar arduin o bisa komunikasi sama OS windows
 char input_cmd[100]; //buffer perintah terminal
 char respon_buffer[256]; //buffer respon arduino
 char file_buffer[256]; //buffer untuk file
@@ -22,10 +22,10 @@ void save_output_file(void);
 void interface_loop(void);
 
 void setup_serial(void) {
-    hComm = CreateFileA("\\\\.\\COM8", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+    hComm = CreateFileA("\\\\.\\COM7", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
     //harus disesuaikan kalau ada perubahan COM
     if (hComm == INVALID_HANDLE_VALUE) {
-        printf("⁴⁰⁴ Error ⁴⁰⁴: Tidak dapat membuka COM8.\n");
+        printf("⁴⁰⁴ Error ⁴⁰⁴: Tidak dapat membuka COM7.\n");
         exit(1);
     }
     DCB dcbSerialParams = {0}; //bikin struktur Device Control Block kosong untuk menampung pengaturan komunikasi hardware
@@ -43,9 +43,9 @@ void setup_serial(void) {
     timeouts.ReadTotalTimeoutMultiplier = 10;
     SetCommTimeouts(hComm, &timeouts);//biar terminal ga freeze kalau arduinonya mati
 
-    printf("Halo Pak Rahadian ^^ bentar ya Arduino sedang reboot\n");
+    printf("\nHalo Pak Rahadian ^^ bentar ya Arduino sedang reboot\n");
     printf("=^..^=    =^..^=    =^..^=   Rebooting for 2 seconds    .=^..^=   =^..^=   =^..^=\n");
-    Sleep(2000);
+    Sleep(1000);
     printf("Arduino di COM8 :-D\n");
     read_arduino();
 }
@@ -65,18 +65,20 @@ void read_arduino(void) { //baca respon dari arduino
 void process_input_file(void) { //upload file input dari lokal komputer ke 
     FILE *file = fopen("inventory_input.txt", "r");
     if (file != NULL) {
-        printf("Uploading file input inventory_input.txt ke Arduino <(-^,^-)=b\n");
+        printf("\n\nUploading file input inventory_input.txt ke Arduino <(-^,^-)=b\n");
         while (fgets(file_buffer, sizeof(file_buffer), file)) {
             file_buffer[strcspn(file_buffer, "\n")] = 0; 
             if (strlen(file_buffer) > 2) { 
                 strcat(file_buffer, "\n");
                 WriteFile(hComm, file_buffer, strlen(file_buffer), &bytesWritten, NULL);
-                Sleep(150); 
+                Sleep(100); 
             }
         }
         fclose(file);
         read_arduino(); 
         printf("\n<(-^,^-)=b Uploaded! <(-^,^-)=b\n");
+        printf("\n=== TERMINAL INVENTARIS ===\n");
+        printf("Ketik perintah (contoh: MENU) atau 'EXIT' untuk keluar: ");
     } else {
         printf(">< >< >< >< >< >< >< >< >< ERROR: kok ga ada input >< >< >< >< >< >< >< >< >< >< ><\n");
     }
@@ -122,10 +124,7 @@ void save_output_file(void) {
 }
 
 void interface_loop(void) {
-    while (1) {
-        printf("\n=== TERMINAL INVENTARIS ===\n");
-        printf("Ketik perintah (contoh: MENU) atau 'EXIT' untuk keluar: ");
-        
+    while (1) {     
         fgets(input_cmd, sizeof(input_cmd), stdin);
         input_cmd[strcspn(input_cmd, "\n")] = 0; 
 

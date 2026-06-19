@@ -1,0 +1,40 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "D:/Kuliah Gengs/Kuliah ITEBEH Era/KRAI/firmware_stm32_V2/Tubes-PMP-Kel-1-K02/include",
+                "D:/Kuliah Gengs/Kuliah ITEBEH Era/KRAI/firmware_stm32_V2/Tubes-PMP-Kel-1-K02/src",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "D:/Kuliah Gengs/Kuliah ITEBEH Era/KRAI/firmware_stm32_V2/Tubes-PMP-Kel-1-K02/include",
+                    "D:/Kuliah Gengs/Kuliah ITEBEH Era/KRAI/firmware_stm32_V2/Tubes-PMP-Kel-1-K02/src",
+                    ""
+                ]
+            },
+            "defines": [
+                "F_CPU=16000000L",
+                "PLATFORMIO=60119",
+                "ARDUINO_AVR_UNO",
+                "__AVR_ATmega328P__",
+                ""
+            ],
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++11",
+            "compilerPath": "C:/Users/ASUS/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe",
+            "compilerArgs": [
+                "-mmcu=atmega328p",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}

@@ -2,6 +2,8 @@
 #define UART_DRIVER_H
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
+#include <avr/pgmspace.h>
 #include <stdint.h>
 
 // Parameter Ring Buffer RX UART 

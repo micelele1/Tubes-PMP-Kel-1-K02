@@ -1,16 +1,68 @@
 #include "../include/interface.h"
 #include "../include/uart_driver.h"
 #include "../include/inventory_db.h"
-#include <avr/pgmspace.h>
 
 static char cmd_buffer[CMD_BUFFER_SIZE];
 static uint8_t cmd_idx = 0;
 
+// String literals stored safely in Flash Program Space
+const char tx_mikon[] PROGMEM = "Mikrokontroler";
+const char tx_aktuator[] PROGMEM = "Aktuator";
+const char tx_sensor[] PROGMEM = "Sensor";
+const char tx_instrumen[] PROGMEM = "Instrumen";
+
+const char tx_tersedia[] PROGMEM = "Tersedia";
+const char tx_habis[] PROGMEM = "Habis";
+const char tx_dipinjam[] PROGMEM = "Dipinjam";
+const char tx_rusak[] PROGMEM = "Rusak";
+
+const char tx_ldte[] PROGMEM = "Lab Dasar Teknik Elektro";
+const char tx_hme[] PROGMEM = "HME ITB";
+const char tx_dosen[] PROGMEM = "Dosen Elektro";
+
+// Array pointer lookups stored in Flash as well
+const char* const LUT_KATEGORI[] PROGMEM = {tx_sensor, tx_aktuator, tx_mikon, tx_instrumen};
+const char* const LUT_STATUS[] PROGMEM = {tx_tersedia, tx_dipinjam, tx_rusak, tx_habis};
+const char* const LUT_PEMILIK[] PROGMEM = {tx_ldte, tx_hme, tx_dosen};
+
+// Zero-RAM helper function to print translation strings directly from Flash
+void print_lut_string(const char* const table[], uint8_t index) {
+    const char* flash_ptr = (const char*)pgm_read_word(&(table[index]));
+    uart_print_P(flash_ptr);
+}
+
 void interface_init(void) {
     cmd_idx = 0;
     cmd_buffer[0] = '\0';
-    uart_print_P(PSTR("\n=== INVENTARIS TERMINAL READY ===\n"));
-    uart_print_P(PSTR("Format: MENU atau CMD;PARAM1;PARAM2;...\n>> "));
+    uart_print_P(PSTR("--------------------------------------------------\n"));
+    uart_print_P(PSTR("System status: ACTIVE\n"));
+    
+    uint16_t free_ram_space = 0;
+    cekMemori(&free_ram_space);
+    
+    uart_print_P(PSTR("Available SRAM Room: "));
+    uart_print_num(free_ram_space);
+    uart_print_P(PSTR(" bytes\n"));
+    uart_print_P(PSTR("--------------------------------------------------\n"));
+    uart_print_P(PSTR("====== INVENTARIS TERMINAL READY ======\n"));
+    uart_print_P(PSTR("Format: MENU atau CMD;PARAM1;PARAM2;...\n\n "));
+    uart_print_P(PSTR("--- FITUR COMMAND TERMINAL ---\n"));
+    uart_print_P(PSTR("1. MENU / HELP\n"));
+    uart_print_P(PSTR("2. INSERTS;ID;NAMA;KAT;JML;LOKASI;STAT;OWN;PIC\n"));
+    uart_print_P(PSTR("3. SEARCH;ID\n"));
+    uart_print_P(PSTR("4. DELETE;ID\n"));
+    uart_print_P(PSTR("4. UPDJML;ID;JUMLAH_BARU\n"));
+    uart_print_P(PSTR("5. UPDSTAT;ID;STATUS_BARU\n"));
+    uart_print_P(PSTR("6. DELETE;ID \n"));
+    uart_print_P(PSTR("7. SHOW\n"));
+    uart_print_P(PSTR("8. DUMP\n"));
+    uart_print_P(PSTR("  ,`/ / \n"));
+    uart_print_P(PSTR(" _)..  `_\n"));
+    uart_print_P(PSTR("( __  -\\n"));
+    uart_print_P(PSTR("    '`.\n"));
+    uart_print_P(PSTR("   ( >_-_, \n"));
+    uart_print_P(PSTR("   _||_ ~-/ \n"));
+    uart_print_P(PSTR("--------------------------------------------------\n>>"));
 }
 
 void interface_loop(void) {
@@ -37,6 +89,7 @@ void interface_loop(void) {
                 
                 cmd_idx = 0;
                 cmd_buffer[0] = '\0';
+                uart_print_P(PSTR(">>"));
             }
         } 
         else {
@@ -57,6 +110,16 @@ void parse_and_execute(char* cmd_str) {
     if (token == NULL) return;
 
     if (strcmp(token, "MENU") == 0 || strcmp(token, "HELP") == 0) {
+        uart_print_P(PSTR("\n--------------------------------------------------\n"));
+        uart_print_P(PSTR("System status: ACTIVE\n"));
+        
+        uint16_t free_ram_space = 0;
+        cekMemori(&free_ram_space);
+        
+        uart_print_P(PSTR("Available SRAM Room: "));
+        uart_print_num(free_ram_space);
+        uart_print_P(PSTR(" bytes\n"));
+        uart_print_P(PSTR("--------------------------------------------------\n"));
         uart_print_P(PSTR("--- FITUR COMMAND TERMINAL ---\n"));
         uart_print_P(PSTR("1. MENU / HELP\n"));
         uart_print_P(PSTR("2. INSERTS;ID;NAMA;KAT;JML;LOKASI;STAT;OWN;PIC\n"));
@@ -115,9 +178,15 @@ void parse_and_execute(char* cmd_str) {
             uart_print_P(PSTR(">< >< >< >< ERROR: ID tidak ditemukan >< >< >< >< ><\n"));
         } else {
             uart_print_P(PSTR(" Item Ditemukan \n"));
-            uart_print_P(PSTR("   Nama    : ")); uart_print(match->nama);     uart_print_P(PSTR("\n"));
-            uart_print_P(PSTR("   Jumlah  : ")); uart_print_num(match->jumlah); uart_print_P(PSTR("\n"));
-            uart_print_P(PSTR("   Lokasi  : ")); uart_print(match->lokasi);   uart_print_P(PSTR("\n"));
+            uart_print_P(PSTR("   ID       : ")); uart_print_num(match->id); uart_print_P(PSTR("\n"));
+            uart_print_P(PSTR("   Nama     : ")); uart_print(match->nama); uart_print_P(PSTR("\n"));
+            uart_print_P(PSTR("   Kategori : ")); print_lut_string(LUT_KATEGORI, match->kategori); uart_print_P(PSTR("\n"));
+            uart_print_P(PSTR("   Jumlah   : ")); uart_print_num(match->jumlah); uart_print_P(PSTR("\n"));
+            uart_print_P(PSTR("   Lokasi   : ")); uart_print(match->lokasi);   uart_print_P(PSTR("\n"));
+            uart_print_P(PSTR("   Status   : ")); print_lut_string(LUT_STATUS, match->kategori); uart_print_P(PSTR("\n"));
+            uart_print_P(PSTR("   Pemilik  : ")); print_lut_string(LUT_PEMILIK, match->kategori); uart_print_P(PSTR("\n"));
+            uart_print_P(PSTR("   PIC      : ")); uart_print(match->PIC); uart_print_P(PSTR("\n"));
+            
         }
         return;
     }
