@@ -137,23 +137,25 @@ void parse_and_execute(char* cmd_str) {
         uart_print_P(PSTR("DUMP_DONE <:3)~~~~\n"));
         return;
     }
+
     if (strcmp(token, "SHOW") == 0) {
     show();
     return;
     }
+
     if (strcmp(token, "UPDJML") == 0) {
     char* p_id = strtok(NULL, ";");
     char* p_jumlah = strtok(NULL, ";");
 
     if (!p_id || !p_jumlah) {
-        uart_print_P(PSTR(">< >< >< >< >< >< >< >< >< ERROR: Parameter UPDJML tidak lengkap >< >< >< >< >< >< >< >< >< >< ><\n"));
+        uart_print_P(PSTR(">< >< >< >< >< ERROR: Parameter UPDJML tidak lengkap >< >< >< >< ><\n"));
         return;
     }
 
     uint16_t id = (uint16_t)atoi(p_id);
-    uint8_t jml = (uint8_t)atoi(p_jumlah);
+    int16_t perubahan = (int16_t)atoi(p_jumlah);
 
-    updateJumlah(id, jml);
+    updateJumlah(id, perubahan);
     return;
 }
 
