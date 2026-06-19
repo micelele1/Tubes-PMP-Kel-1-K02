@@ -132,17 +132,20 @@ void searchItem(uint16_t id, Inventaris** result){
     }
 }
 
-void updateJumlah(uint16_t id, uint8_t updateJumlah){ //blm ada di interface
-    Inventaris* item;
-    searchItem(id, &item);
+void updateJumlah(uint16_t id, int16_t perubahan){
+Inventaris* item;
+searchItem(id, &item);
 
-    if (item != NULL){
-        item->jumlah = updateJumlah;
-        uart_print_P(PSTR("Sukses <('-'<) ^('-')^ (>'-')> Jumlah item berhasil diperbarui.\n"));
+if (item != NULL){
+    if (perubahan < 0 && item->jumlah < (uint8_t)(-perubahan)){
+        uart_print_P(PSTR(">< >< >< >< >< ERROR: Stok tidak mencukupi untuk dipinjam >< >< >< >< ><\n"));
     } else {
-        uart_print_P(PSTR(">< >< >< >< >< >< >< >< >< ERROR: : Item tidak ditemukan >< >< >< >< >< >< >< >< >< >< ><\n"));
+        item->jumlah = (uint8_t)(item->jumlah + perubahan);
+        uart_print_P(PSTR("Sukses <('-'<) ^('-')^ (>'-')> Jumlah item berhasil diperbarui.\n"));
     }
-}
+} else {
+    uart_print_P(PSTR(">< >< >< >< >< ERROR: : Item tidak ditemukan >< >< >< >< ><\n"));
+}}
 
 void updateStatus(uint16_t id, uint8_t updateStatus){ //blm ad di interface
     Inventaris* item;
