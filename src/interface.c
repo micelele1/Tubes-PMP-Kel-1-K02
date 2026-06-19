@@ -86,11 +86,15 @@ void parse_and_execute(char* cmd_str) {
     // --- COMMAND 1: HELP / MENU ---
     if (strcmp(token, "MENU") == 0 || strcmp(token, "HELP") == 0) {
         // OPTIMIZED: Long menu arrays completely stripped out of SRAM baseline
-        uart_print_p(PSTR("--- FITUR COMMAND TERMINAL ---\n"));
+        uart_print_p(PSTR("-------- FITUR COMMAND TERMINAL --------\n"));
         uart_print_p(PSTR("1. MENU / HELP\n"));
         uart_print_p(PSTR("2. INSERTS;ID;NAMA;KAT;JML;LOKASI;STAT;OWN;PIC\n"));
         uart_print_p(PSTR("3. SEARCH;ID\n"));
         uart_print_p(PSTR("4. DELETE;ID\n"));
+        uart_print_p(PSTR("5. SETJUMLAH;ID;JMLH"));
+        uart_print_p(PSTR("6. SETSTATUS;ID;STATUS"));
+        uart_print_p(PSTR("7. DISPLAYALL"));
+        uart_print_p(PSTR("8. STATUS"));
         return;
     }
 
@@ -106,7 +110,7 @@ void parse_and_execute(char* cmd_str) {
         char* p_PIC      = strtok(NULL, ";");
 
         if (!p_id || !p_nama || !p_kategori || !p_jumlah || !p_lokasi || !p_status || !p_pemilik || !p_PIC) {
-            uart_print_p(PSTR("Error: Parameter INSERT tidak lengkap!\n"));
+            uart_print_p(PSTR("ERROR: Parameter INSERT tidak lengkap!\n"));
             return;
         }
 
@@ -115,9 +119,31 @@ void parse_and_execute(char* cmd_str) {
         uint8_t jml = (uint8_t)atoi(p_jumlah);
         uint8_t stat = (uint8_t)atoi(p_status);
         uint8_t own = (uint8_t)atoi(p_pemilik);
+        uint8_t statusFlag;
 
-        insertItem(id, p_nama, kat, jml, p_lokasi, stat, own, p_PIC);
-        uart_print_p(PSTR("Sukses: Input diproses ke database.\n"));
+        insertItem(id, p_nama, kat, jml, p_lokasi, stat, own, p_PIC, statusFlag);
+        
+        switch (statusFlag){
+            case INSERT_SUCCESS:
+                uart_print_p(PSTR("SUKSES: Input diproses ke database.\n"));
+                break;
+            
+            case INSERT_SUCESS_MOSTLY:
+                uart_print_p(PSTR("SUKSES: Input diproses ke database.\n"));
+                uart_print_p(PSTR("WARNING: Memori yang tersisa Kurang Dari 150 byte dari batas aman!"));
+                break;
+
+            case INSERT_FAILED_DUP:
+                uart_print_p(PSTR("ERROR: Terdeteksi ID Duplikat!"));
+                break;
+
+            case INSERT_FAILED_FULL:
+                uart_print_p(PSTR("ERROR: Memori Tidak Cukup!"));
+                break;
+
+            case INSERT_FAILED_ERR:
+                uart_print_p(PSTR("ERROR: Gagal Mengalokasi Memori Node!"));
+        }
         return;
     }
 
@@ -125,7 +151,7 @@ void parse_and_execute(char* cmd_str) {
     if (strcmp(token, "SEARCH") == 0) {
         char* p_id = strtok(NULL, ";");
         if (!p_id) {
-            uart_print_p(PSTR("Error: ID harus diisi!\n"));
+            uart_print_p(PSTR("ERROR: ID harus diisi!\n"));
             return;
         }
 
@@ -134,7 +160,7 @@ void parse_and_execute(char* cmd_str) {
         searchItem(target_id, &match);
 
         if (match == NULL) {
-            uart_print_p(PSTR("Error: Item dengan ID tersebut tidak ditemukan.\n"));
+            uart_print_p(PSTR("ERROR: Item dengan ID tersebut tidak ditemukan.\n"));
         } else {
             uart_print_p(PSTR("-> Item Ditemukan: \n"));
             uart_print_p(PSTR("   Nama    : ")); uart_print(match->nama);     uart_print_p(PSTR("\n"));
@@ -148,15 +174,23 @@ void parse_and_execute(char* cmd_str) {
     if (strcmp(token, "DELETE") == 0) {
         char* p_id = strtok(NULL, ";");
         if (!p_id) {
-            uart_print_p(PSTR("Error: ID harus diisi!\n"));
+            uart_print_p(PSTR("ERROR: ID harus diisi!\n"));
             return;
         }
 
         uint16_t target_id = (uint16_t)atoi(p_id);
         deleteItem(target_id);
-        uart_print_p(PSTR("Sukses: Eksekusi penghapusan selesai.\n"));
+        uart_print_p(PSTR("SUKSES: Eksekusi penghapusan selesai.\n"));
         return;
     }
 
-    uart_print_p(PSTR("Error: Command tidak dikenali. Ketik 'MENU' untuk bantuan.\n"));
+    // --- COMMAND 5: SET JUMLAH ---
+
+    // --- COMMAND 6: SET STATUS ---
+
+    // --- COMMAND 7: DISPLAY ALL ---
+
+    // --- COMMAND 8: STATUS ---
+
+    uart_print_p(PSTR("ERROR: Command tidak dikenali. Ketik 'MENU' untuk bantuan.\n"));
 }

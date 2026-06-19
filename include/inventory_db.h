@@ -10,6 +10,13 @@
 // Ukuran Hash Table
 #define HASH_TABLE_SIZE 7
 
+// Definisi Flag Status Insert
+#define INSERT_SUCCESS 0            // Insert Item Berhasil
+#define INSERT_SUCESS_MOSTLY 1      // Insert Item Berhasil Namun Memori Hampir Penuh
+#define INSERT_FAILED_DUP 2         // Insert Item Gagal Karena Duplikasi
+#define INSERT_FAILED_FULL 3        // Insert Item Gagal Karena Memori Penuh
+#define INSERT_FAILED_ERR 4         // Insert Item Gagal Karena Error Alokasi Memori
+
 // Kategori Barang Inventaris
 typedef enum {K_SENSOR, K_AKTUATOR, K_MIKON, K_KABEL, K_INSTRUMEN} Kategori;
 
@@ -45,7 +52,8 @@ void cekMemori(uint16_t* memori);                   // Cek Besar Memori yang Ter
 // Fungsi CRUD
 // Menambahkan Item Baru ke Database
 void insertItem(uint16_t id, const char* nama, uint8_t kategori, uint8_t jumlah, 
-                const char* lokasi, uint8_t status, uint8_t pemilik, const char* PIC);
+                const char* lokasi, uint8_t status, uint8_t pemilik, const char* PIC,
+                uint8_t* statusFlag);
 
 // Menghapus Item dari Database Berdasarkan ID
 void deleteItem(uint16_t id);

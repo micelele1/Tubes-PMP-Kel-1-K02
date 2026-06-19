@@ -47,7 +47,8 @@ void hashFunction(uint16_t id, uint8_t* index){
 
 // CRUD 1: Menambahkan Item Baru ke Database
 void insertItem(uint16_t id, const char* nama, uint8_t kategori, uint8_t jumlah,
-                const char* lokasi, uint8_t status, uint8_t pemilik, const char* PIC)
+                const char* lokasi, uint8_t status, uint8_t pemilik, const char* PIC,
+                uint8_t* statusFlag)
 {
     uint8_t index;          // Variabel Lokal untuk Menyimpan Index Hash
     uint16_t memoriFree;    // Variabel Lokal untuk Menyimpan Memori yang Tersisa
@@ -60,6 +61,7 @@ void insertItem(uint16_t id, const char* nama, uint8_t kategori, uint8_t jumlah,
     if(tesIdx != NULL){
         // ITEM DENGAN ID YANG SAMA SUDAH ADA
         // Print: ERROR ITEM DENGAN ID YANG SAMA SUDAH ADA
+        *statusFlag = INSERT_FAILED_DUP;
         return;
     }
 
@@ -69,12 +71,14 @@ void insertItem(uint16_t id, const char* nama, uint8_t kategori, uint8_t jumlah,
     if (memoriFree < 350 + sizeof(Inventaris)){
         // MEMORI TIDAK CUKUP UNTUK MENAMBAHKAN ITEM BARU
         // Print: ERROR MEMORI PENUH
+        *statusFlag = INSERT_FAILED_FULL;
         return;
     }
     else if (memoriFree < 500 + sizeof(Inventaris)){
         // MEMORI MULAI MENIPIS, PERINGATAN UNTUK MENGOSONGKAN DATABASE
         // Print: PERINGATAN MEMORI MULAI MENIPIS
         // Sisa: (memoriFree - 350) / sizeof(Inventaris) item lagi yang bisa ditambahkan sebelum penuh
+        *statusFlag = INSERT_SUCESS_MOSTLY;
     }
 
     // Alokasi Dinamis untuk Node Inventaris Baru
@@ -84,6 +88,7 @@ void insertItem(uint16_t id, const char* nama, uint8_t kategori, uint8_t jumlah,
     if (newNode == NULL){
         // Gagal Alokasi Memori
         // Print: ERROR ALOKASI MEMORI
+        *statusFlag = INSERT_FAILED_ERR;
         return; 
     }
     
@@ -104,6 +109,9 @@ void insertItem(uint16_t id, const char* nama, uint8_t kategori, uint8_t jumlah,
     // Insert Node Baru ke Hash Table (Insert di Awal Linked List)
     newNode->next = hashTable[index];   // Insert di Awal Linked List
     hashTable[index] = newNode;         // Update Head Linked List di Hash Table
+
+    // Output Flag Sukses
+    *statusFlag = INSERT_SUCCESS;
 }
 
 // CRUD 2: Hapus Item dari Database Berdasarkan ID
