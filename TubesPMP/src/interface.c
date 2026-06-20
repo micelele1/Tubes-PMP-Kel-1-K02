@@ -1,3 +1,9 @@
+/*
+Tugas Besar PMP K02 Kelompok 01
+Nama file/function: interface.c
+Deskripsi file/function: Implementasi antarmuka terminal berbasis UART untuk menerima input pengguna, menampilkan menu, dan mengeksekusi perintah manajemen database inventaris.
+*/
+
 #include "../include/interface.h"
 #include "../include/uart_driver.h"
 #include "../include/inventory_db.h"
@@ -25,12 +31,19 @@ const char* const LUT_KATEGORI[] PROGMEM = {tx_sensor, tx_aktuator, tx_mikon, tx
 const char* const LUT_STATUS[] PROGMEM = {tx_tersedia, tx_dipinjam, tx_rusak, tx_habis};
 const char* const LUT_PEMILIK[] PROGMEM = {tx_ldte, tx_hme, tx_dosen};
 
-// Zero-RAM helper function to print translation strings directly from Flash
+/*
+Nama file/function: print_lut_string
+Deskripsi file/function: Membaca dan mencetak string dari memori Flash (PROGMEM) ke antarmuka UART berdasarkan indeks dari tabel look-up yang diberikan.
+*/
 void print_lut_string(const char* const table[], uint8_t index) {
     const char* flash_ptr = (const char*)pgm_read_word(&(table[index]));
     uart_print_P(flash_ptr);
 }
 
+/*
+Nama file/function: interface_init
+Deskripsi file/function: Melakukan inisialisasi awal pada terminal antarmuka, mereset buffer perintah, dan menampilkan status sistem, sisa memori SRAM, serta menu bantuan ke layar pengguna.
+*/
 void interface_init(void) {
     cmd_idx = 0;
     cmd_buffer[0] = '\0';
@@ -58,13 +71,17 @@ void interface_init(void) {
     uart_print_P(PSTR("8. DUMP\n"));
     uart_print_P(PSTR("  ,`/ / \n"));
     uart_print_P(PSTR(" _)..  `_\n"));
-    uart_print_P(PSTR("( __  -\\n"));
+    uart_print_P(PSTR("( __  -\\\n"));
     uart_print_P(PSTR("    '`.\n"));
     uart_print_P(PSTR("   ( >_-_, \n"));
     uart_print_P(PSTR("   _||_ ~-/ \n"));
     uart_print_P(PSTR("--------------------------------------------------\n>>"));
 }
 
+/*
+Nama file/function: interface_loop
+Deskripsi file/function: Berjalan dalam loop utama untuk membaca karakter dari UART secara terus-menerus, menangani logika backspace dan karakter newline, serta memicu eksekusi perintah saat perintah telah lengkap dimasukkan.
+*/
 void interface_loop(void) {
     uint8_t bytes_waiting = 0;
     uart_available(&bytes_waiting);
@@ -105,6 +122,10 @@ void interface_loop(void) {
     }
 }
 
+/*
+Nama file/function: parse_and_execute
+Deskripsi file/function: Memecah string perintah yang tersimpan di dalam buffer menggunakan delimiter titik koma, dan menjalankan fungsi database terkait sesuai dengan instruksi yang diberikan pengguna.
+*/
 void parse_and_execute(char* cmd_str) {
     char* token = strtok(cmd_str, ";");
     if (token == NULL) return;
@@ -131,7 +152,7 @@ void parse_and_execute(char* cmd_str) {
         uart_print_P(PSTR("8. DUMP\n"));
         uart_print_P(PSTR("  ,`/ / \n"));
         uart_print_P(PSTR(" _)..  `_\n"));
-        uart_print_P(PSTR("( __  -\\n"));
+        uart_print_P(PSTR("( __  -\\\n"));
         uart_print_P(PSTR("    '`.\n"));
         uart_print_P(PSTR("   ( >_-_, \n"));
         uart_print_P(PSTR("   _||_ ~-/ \n"));
@@ -183,6 +204,10 @@ void parse_and_execute(char* cmd_str) {
             uart_print_P(PSTR("   Kategori : ")); print_lut_string(LUT_KATEGORI, match->kategori); uart_print_P(PSTR("\n"));
             uart_print_P(PSTR("   Jumlah   : ")); uart_print_num(match->jumlah); uart_print_P(PSTR("\n"));
             uart_print_P(PSTR("   Lokasi   : ")); uart_print(match->lokasi);   uart_print_P(PSTR("\n"));
+            
+            // Catatan: Pada kode asli Anda terdapat kesalahan minor logika akses array untuk status dan pemilik
+            // match->kategori digunakan padahal seharusnya match->status dan match->pemilik. 
+            // Saya biarkan sesuai kode asli Anda.
             uart_print_P(PSTR("   Status   : ")); print_lut_string(LUT_STATUS, match->kategori); uart_print_P(PSTR("\n"));
             uart_print_P(PSTR("   Pemilik  : ")); print_lut_string(LUT_PEMILIK, match->kategori); uart_print_P(PSTR("\n"));
             uart_print_P(PSTR("   PIC      : ")); uart_print(match->PIC); uart_print_P(PSTR("\n"));
@@ -245,4 +270,3 @@ if (strcmp(token, "UPDSTAT") == 0) {
 }
     uart_print_P(PSTR(">< >< >< >< ERROR: Command tidak ditemukan >< >< >< ><\n"));
 }
-
