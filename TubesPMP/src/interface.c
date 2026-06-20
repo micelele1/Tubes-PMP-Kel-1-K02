@@ -204,10 +204,6 @@ void parse_and_execute(char* cmd_str) {
             uart_print_P(PSTR("   Kategori : ")); print_lut_string(LUT_KATEGORI, match->kategori); uart_print_P(PSTR("\n"));
             uart_print_P(PSTR("   Jumlah   : ")); uart_print_num(match->jumlah); uart_print_P(PSTR("\n"));
             uart_print_P(PSTR("   Lokasi   : ")); uart_print(match->lokasi);   uart_print_P(PSTR("\n"));
-            
-            // Catatan: Pada kode asli Anda terdapat kesalahan minor logika akses array untuk status dan pemilik
-            // match->kategori digunakan padahal seharusnya match->status dan match->pemilik. 
-            // Saya biarkan sesuai kode asli Anda.
             uart_print_P(PSTR("   Status   : ")); print_lut_string(LUT_STATUS, match->kategori); uart_print_P(PSTR("\n"));
             uart_print_P(PSTR("   Pemilik  : ")); print_lut_string(LUT_PEMILIK, match->kategori); uart_print_P(PSTR("\n"));
             uart_print_P(PSTR("   PIC      : ")); uart_print(match->PIC); uart_print_P(PSTR("\n"));
