@@ -62,7 +62,6 @@ void uart_print(const char* str) {
     }
 }
 
-// FUNGSI INI SEBELUMNYA HILANG
 /*
 Nama file/function: uart_print_P
 Deskripsi file/function: Membaca dan mengirimkan string yang disimpan di memori Flash (PROGMEM) untuk menghemat penggunaan RAM.
