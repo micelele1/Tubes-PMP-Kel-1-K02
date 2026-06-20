@@ -1,3 +1,9 @@
+/*
+Tugas Besar PMP K02 Kelompok 01
+Nama file/function: inventory_db.h
+Deskripsi file/function: File header yang berisi deklarasi struktur data, makro, dan fungsi-fungsi untuk manajemen database inventaris menggunakan hash table.
+*/
+
 #ifndef INVENTORY_DB_H
 #define INVENTORY_DB_H
 
@@ -37,30 +43,74 @@ typedef struct NodeInventaris{
 extern Inventaris* hashTable[HASH_TABLE_SIZE];
 
 // Fungsi Primitif
+
+/*
+Nama file/function: initNode
+Deskripsi file/function: Fungsi untuk menginisialisasi node inventaris baru dengan nilai default.
+*/
 void initNode(Inventaris* node);
-void initHashTable(void);                           // Inisialisasi Hash Table
-void initDB(void);                                  // Inisialisasi Database
-void hash_function(uint16_t id, uint8_t* index);    // Fungsi Hash untuk Menentukan Index dalam Hash Table
+
+/*
+Nama file/function: initHashTable
+Deskripsi file/function: Fungsi untuk menginisialisasi array hash table dengan mengatur semua pointer menjadi NULL.
+*/
+void initHashTable(void);                           
+
+/*
+Nama file/function: initDB
+Deskripsi file/function: Fungsi untuk menginisialisasi database secara keseluruhan beserta data awalnya.
+*/
+void initDB(void);                                  
+
+/*
+Nama file/function: hash_function
+Deskripsi file/function: Fungsi hash untuk menghitung dan menentukan indeks suatu item di dalam hash table berdasarkan ID.
+*/
+void hash_function(uint16_t id, uint8_t* index);    
 
 // Fungsi CRUD
-// Menambahkan Item Baru ke Database
+
+/*
+Nama file/function: insertItem
+Deskripsi file/function: Fungsi untuk menambahkan item inventaris baru beserta detail informasinya ke dalam database.
+*/
 void insertItem(uint16_t id, const char* nama, uint8_t kategori, uint8_t jumlah, 
                 const char* lokasi, uint8_t status, uint8_t pemilik, const char* PIC);
 
-// Menghapus Item dari Database Berdasarkan ID
+/*
+Nama file/function: deleteItem
+Deskripsi file/function: Fungsi untuk menghapus item inventaris dari database berdasarkan ID yang diberikan.
+*/
 void deleteItem(uint16_t id);
 
-// Mencari Item dalam Database Berdasarkan ID
+/*
+Nama file/function: searchItem
+Deskripsi file/function: Fungsi untuk mencari item dalam database berdasarkan ID dan mengembalikan hasilnya melalui pointer result.
+*/
 void searchItem(uint16_t id, Inventaris** result);
 
-// Mengupdate Jumlah Barang dalam Database Berdasarkan ID
+/*
+Nama file/function: updateJumlah
+Deskripsi file/function: Fungsi untuk mengubah jumlah stok suatu barang dalam database berdasarkan ID.
+*/
 void updateJumlah(uint16_t id, int16_t perubahan);
 
-// Mengupdate Status Barang dalam Database Berdasarkan ID
+/*
+Nama file/function: updateStatus
+Deskripsi file/function: Fungsi untuk memperbarui status kondisi suatu barang dalam database berdasarkan ID.
+*/
 void updateStatus(uint16_t id, uint8_t newStatus);
 
+/*
+Nama file/function: dump
+Deskripsi file/function: Fungsi untuk mencetak seluruh isi struktur database secara mentah untuk keperluan debugging.
+*/
 void dump(void);
 
+/*
+Nama file/function: show
+Deskripsi file/function: Fungsi untuk menampilkan seluruh data inventaris dalam database secara terstruktur kepada pengguna.
+*/
 void show(void);
 
 #endif // INVENTORY_DB_H
